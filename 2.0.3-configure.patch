@@ -1,0 +1,111 @@
+--- origsrc/qca-2.0.3/configure	2010-11-27 15:16:26.000000000 -0600
++++ src/qca-2.0.3/configure	2013-11-25 23:56:58.747163100 -0600
+@@ -464,7 +464,7 @@ public:
+ 		if(conf->getenv("QC_SEPARATE_DEBUG_INFO") == "Y")
+ 			opt_separate_debug_info = true;
+ 
+-#if !defined(Q_OS_WIN) && !defined(Q_OS_MAC)
++#if 0 // !defined(Q_OS_WIN) && !defined(Q_OS_MAC)
+ 		if(opt_debug_and_release)
+ 		{
+ 			printf("\nError: The --debug-and-release option is for windows/mac only.\n");
+@@ -472,7 +472,7 @@ public:
+ 		}
+ #endif
+ 
+-#ifdef Q_OS_WIN
++#if 1 //def Q_OS_WIN
+ 		if(opt_no_separate_debug_info)
+ 		{
+ 			printf("\nError: The --no-separate-debug-info option is for unix only.\n");
+@@ -738,7 +738,7 @@ public:
+ 
+ 	bool exec()
+ 	{
+-#ifndef Q_OS_WIN
++#if 0 //ndef Q_OS_WIN
+ 		// --prefix=\$pwd ?
+ 		QString datadir;
+ 		if(QFile::exists(conf->getenv("PREFIX") + "/qca.pro"))
+@@ -752,7 +752,7 @@ public:
+ 		QString str;
+ 		QFile f;
+ 
+-#ifndef Q_OS_WIN
++#if 0 //ndef Q_OS_WIN
+ 		// HAVE_SYS_FILIO_H
+ 		if(conf->findHeader("sys/filio.h", QStringList(), &str))
+ 		{
+@@ -799,7 +799,7 @@ public:
+ 
+ 		// write confapp.pri
+ 		str = QString();
+-#ifndef Q_OS_WIN
++#if 1 //ndef Q_OS_WIN
+                 QString var = conf->getenv("BINDIR");
+                 if(!var.isEmpty())
+ 			str += QString("BINDIR = %1\n").arg(var);
+@@ -829,7 +829,7 @@ public:
+ 			f.write(str.toLatin1());
+ 		f.close();
+ 
+-#ifdef Q_OS_WIN
++#if 0 //def Q_OS_WIN
+ 		QString prefix = QDir::currentPath();
+ 		QString incdir = prefix + "/include";
+ 		QString libdir = prefix + "/lib";
+@@ -859,12 +859,12 @@ public:
+ 			f.close();
+ 		}
+ 
+-#ifndef Q_OS_WIN
++#if 1 //ndef Q_OS_WIN
+ 		str = QString(
+-		"prffiles.path = %1/mkspecs/features\n"
++		"prffiles.path = \$\$[QT_INSTALL_DATA]/mkspecs/features\n"
+ 		"prffiles.files = crypto.prf\n"
+ 		"INSTALLS += prffiles\n"
+-		).arg(QLibraryInfo::location(QLibraryInfo::DataPath));
++		);
+ 		conf->addExtra(str);
+ 
+ 		// write pkg-config files
+@@ -977,7 +977,7 @@ public:
+ 	{
+ 		bundled = false;
+ 
+-#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
++#if 1 // defined(Q_OS_WIN) || defined(Q_OS_MAC)
+ 		// use built-in
+ 		return true;
+ #else
+@@ -1045,7 +1045,7 @@ public:
+ 
+ 	QString resultString() const
+ 	{
+-#if defined(Q_OS_WIN)
++#if 1 // defined(Q_OS_WIN)
+ 		return "using Windows built-in";
+ #elif defined(Q_OS_MAC)
+ 		return "using Mac built-in";
+--- origsrc/qca-2.0.3/src/src.pro	2010-11-27 15:14:12.000000000 -0600
++++ src/qca-2.0.3/src/src.pro	2013-11-26 00:00:15.043390600 -0600
+@@ -99,7 +99,7 @@ mac:lib_bundle: {
+ 	}
+ }
+ 
+-unix: {
++system(/bin/true): {
+ 	# install
+ 	target.path = $$LIBDIR
+ 	INSTALLS += target
+@@ -108,7 +108,9 @@ unix: {
+ 	incfiles.files = $$PUBLIC_HEADERS
+ 	incfiles.files += $$QCA_INC/qca.h $$QCA_INC/QtCrypto
+ 	!lib_bundle:INSTALLS += incfiles
++}
+ 
++unix: {
+ 	manfiles.path = $$DATADIR/man/man1
+ 	manfiles.files = $$QCA_BASE/man/qcatool2.1
+ 	INSTALLS += manfiles
