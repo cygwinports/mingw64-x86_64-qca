@@ -3,7 +3,7 @@ inherit cross qt4-qmake
 
 NAME="mingw64-x86_64-qca2"
 VERSION=2.0.3
-RELEASE=1
+RELEASE=2
 CATEGORY="Devel"
 SUMMARY="Qt4 Cryptographic Architecture for Win64 toolchain"
 DESCRIPTION="Qt Cryptographic Architecture aims to provide a straightforward
