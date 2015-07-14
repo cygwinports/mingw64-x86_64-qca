@@ -1,0 +1,103 @@
+CROSS_HOST="x86_64-w64-mingw32"
+inherit cross cmake qt4 qt5
+
+NAME="mingw64-x86_64-qca"
+VERSION=2.1.0
+RELEASE=1
+CATEGORY="Devel"
+SUMMARY="Qt Cryptographic Architecture for Win64 toolchain"
+DESCRIPTION="Qt Cryptographic Architecture aims to provide a straightforward
+and cross-platform crypto API, using Qt datatypes and conventions. QCA
+separates the API from the implementation, using plugins known as Providers."
+HOMEPAGE="http://delta.affinix.com/qca"
+SRC_URI="http://delta.affinix.com/download/qca/2.0/qca-${VERSION}.tar.gz"
+SRC_DIR="qca-${VERSION}"
+PATCH_URI="
+	fedora/0001-dropped-unused-include.patch
+	fedora/0002-cmake-pkg-config-is-not-REQUIRED.patch
+	fedora/0003-qca-ossl-fixed-compilation-warnings.patch
+	fedora/0004-cmake-dropped-dead-variable.patch
+	fedora/0005-Fix-build-with-libressl.patch
+	fedora/0006-increased-minimum-cmake-version.patch
+	fedora/0007-cmake-warn-user-when-QCA_SUFFIX-is-not-set.patch
+	fedora/0008-cmake-apply-QCA_SUFFIX-for-cmake-config-module-names.patch
+	fedora/0009-cmake-build-for-android.patch
+	fedora/0010-fixed-compilation-on-android.patch
+	fedora/0011-simplified-md5_state_t-and-SHA1_CONTEXT-internal-str.patch
+	fedora/0012-cmake-fixed-warnings-on-android.patch
+	fedora/0013-docs-fixed-no-images-in-docs-when-build-out-of-sourc.patch
+	fedora/0014-cmake-fixed-cmake-config-module-when-used-QCA_SUFFIX.patch
+	fedora/0015-fix-library-name-in-prf-file-to-use-the-lib-name-var.patch
+	fedora/0016-move-QCA_CONFIG_NAME_BASE-definition-in-the-regular-.patch
+	fedora/0017-fixed-array-size-checking.patch
+	fedora/0019-prevent-filewatches-from-emitting-changes-when-there.patch
+	fedora/0020-put-headers-of-a-suffixed-build-in-a-suffixed-direct.patch
+	fedora/0021-properly-support-co-existing-qt4-and-qt5-versions.patch
+	fedora/0022-initialize-QCA_SUFFIX-cache-with-the-possibly-previo.patch
+	2.1.0-mingw-pkgconfig.patch
+"
+
+PKG_NAMES="${NAME} ${NAME}-qt5"
+mingw64_x86_64_qca_OBSOLETES="mingw64-x86_64-qca2"
+mingw64_x86_64_qca_CONTENTS="
+	${CROSS_BINDIR#/}/libqca.dll
+	${QT4_INCLUDEDIR#/}/QtCrypto/
+	${CROSS_LIBDIR#/}/cmake/Qca/
+	${CROSS_LIBDIR#/}/libqca.dll.a
+	${CROSS_LIBDIR#/}/pkgconfig/qca2.pc
+	${QT4_PLUGINSDIR#/}/crypto/
+	${QT4_MKSPECSDIR#/}/features/crypto.prf
+	usr/share/doc/${NAME}/
+"
+mingw64_x86_64_qca_qt5_CONTENTS="
+	${CROSS_BINDIR#/}/libqca-qt5.dll
+	${QT5_INCLUDEDIR#/}/QtCrypto/
+	${CROSS_LIBDIR#/}/cmake/Qca-qt5/
+	${CROSS_LIBDIR#/}/libqca-qt5.dll.a
+	${CROSS_LIBDIR#/}/pkgconfig/qca2-qt5.pc
+	${QT5_PLUGINSDIR#/}/crypto/
+	${QT5_MKSPECSDIR#/}/features/crypto.prf
+	usr/share/doc/${NAME}-qt5/
+"
+
+src_compile() {
+	mkdir -p ${B}/qt4
+	cd ${B}/qt4
+	cygcmake \
+		-DQT4_BUILD=ON -DBUILD_TOOLS=OFF \
+		-DQCA_DOC_INSTALL_DIR=/usr/share/doc/${NAME} \
+		-DQCA_FEATURE_INSTALL_DIR=${QT4_MKSPECSDIR}/features \
+		-DQCA_INCLUDE_INSTALL_DIR=${QT4_INCLUDEDIR} \
+		-DQCA_PRIVATE_INCLUDE_INSTALL_DIR=${QT4_INCLUDEDIR} \
+		-DQCA_LIBRARY_INSTALL_DIR=${QT4_LIBDIR} \
+		-DQCA_PLUGINS_INSTALL_DIR=${QT4_PLUGINSDIR}
+	cygmake
+
+	mkdir -p ${B}/qt5
+	cd ${B}/qt5
+	cygcmake \
+		-DQT4_BUILD=OFF -DBUILD_TOOLS=OFF \
+		-DQCA_DOC_INSTALL_DIR=/usr/share/doc/${NAME}-qt5 \
+		-DQCA_FEATURE_INSTALL_DIR=${QT5_MKSPECSDIR}/features \
+		-DQCA_INCLUDE_INSTALL_DIR=${QT5_INCLUDEDIR} \
+		-DQCA_PRIVATE_INCLUDE_INSTALL_DIR=${QT5_INCLUDEDIR}/QtCrypto/${VERSION}/QtCrypto/private \
+		-DQCA_LIBRARY_INSTALL_DIR=${QT5_LIBDIR} \
+		-DQCA_PLUGINS_INSTALL_DIR=${QT5_PLUGINSDIR}
+	cygmake
+}
+
+src_test() {
+	cd ${B}/qt4
+	make -k test || true
+	cd ${B}/qt5
+	make -k test || true
+}
+
+src_install() {
+	cd ${B}/qt4
+	cyginstall
+	cd ${B}/qt5
+	cyginstall
+	docinto /${NAME}-qt5
+	dodoc ${S}/{COPYING,README,TODO}
+}

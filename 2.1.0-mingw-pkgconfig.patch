@@ -1,0 +1,20 @@
+--- origsrc/qca-2.1.0/CMakeLists.txt	2015-07-14 16:36:22.077782300 -0500
++++ src/qca-2.1.0/CMakeLists.txt	2015-07-14 17:07:18.794055300 -0500
+@@ -223,7 +223,7 @@ foreach(PATH QCA_PLUGINS_INSTALL_DIR
+   endif()
+ endforeach()
+ 
+-if(NOT WIN32)
++if(1)
+   if(OSX_FRAMEWORK)
+     set(PKGCONFIG_CFLAGS "-F\${libdir} -I\${libdir}/${QCA_LIB_NAME}.framework/Headers")
+     set(PKGCONFIG_LIBS "-F\${libdir} -framework ${QCA_LIB_NAME}")
+@@ -237,7 +237,7 @@ if(NOT WIN32)
+   if(NOT DEVELOPER_MODE)
+     install(FILES "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/${QCA_PC_NAME}" DESTINATION ${PKGCONFIG_INSTALL_PREFIX})
+   endif()
+-endif(NOT WIN32)
++endif(1)
+ 
+ # strip CMAKE_INSTALL_PREFIX in all paths
+ if(USE_RELATIVE_PATHS)
